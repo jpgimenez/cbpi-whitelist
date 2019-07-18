@@ -9,3 +9,7 @@ If you want to whitelist a full iip range e.g. 10.128.0.1 to 10.128.0.254 the ci
 
 ## Notes
 This plugin will work in conjunction with the httpauth plugin, the ip's will be validated before the auth plugin is called. This can be used for an extra level of security
+
+
+## TODO
+I am currently investigating a way to do request origin whitelisting so that things like incoming webhooks can be secured. ie. plaato, tiltpi etc
