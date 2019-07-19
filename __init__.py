@@ -1,7 +1,8 @@
 from modules import app, cbpi
-from flask import request, abort
+from flask import request, abort, Blueprint
 
 import socket
+import json
 
 try:
     from netaddr import IPNetwork, IPAddress
@@ -10,6 +11,7 @@ except:
     os.system('pip install netaddr')
     from netaddr import IPNetwork, IPAddress
 
+blueprint = Blueprint('plaato', __name__)
 
 ip_address = socket.gethostbyname(socket.gethostname())
 split = ip_address.split('.')
@@ -34,6 +36,8 @@ static_cidr = [
     local_cidr
 ]
 
+blocked_ips = []
+
 
 @app.before_request
 def limit_remote_addr():
@@ -43,4 +47,16 @@ def limit_remote_addr():
         if IPAddress(request.remote_addr) in IPNetwork(address):
             return
 
+    if request.remote_addr not in blocked_ips:
+        blocked_ips.append(request.remote_addr)
     abort(404)
+
+
+@blueprint.route('/', methods=['GET'])
+def hello_world():
+    return json.dumps(blocked_ips)
+
+
+@cbpi.initalizer()
+def init(cbpi):
+    cbpi.app.register_blueprint(blueprint, url_prefix='/api/blockedips')
